@@ -1,0 +1,4 @@
+bingot
+======
+
+a simple cryptocurrency
