@@ -6,6 +6,7 @@
 #include <QVector>
 #include "Neighbor.h"
 #include "SocketWorker.h"
+#include "NetworkTaskQueue.h"
 
 class NetworkEngine : public QTcpServer
 {
@@ -14,9 +15,11 @@ public:
     NetworkEngine();
     void incomingConnection(qintptr socketId);
     void initialize();
+    ~NetworkEngine();
 private:
-    QList<Neighbor> neighborList;
-    QVector<SocketWorker*> socketWorkerList;
+    QList<Neighbor> m_neighborList;
+    QVector<SocketWorker*> m_socketWorkerList;
+    NetworkTaskQueue *m_taskQueue;
 };
 
 #endif // NETWORKENGINE_H

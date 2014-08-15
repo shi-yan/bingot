@@ -21,8 +21,9 @@ SOURCES += main.cpp\
     Miner.cpp \
     NetworkEngine.cpp \
     SocketWorker.cpp \
-    NetworkTaskQueue.cpp \
-    Neighbor.cpp
+    Neighbor.cpp \
+    NetworkTask.cpp \
+    NetworkTaskQueue.cpp
 
 HEADERS  += MainWindow.h \
     Bingot.h \
@@ -33,8 +34,9 @@ HEADERS  += MainWindow.h \
     NetworkEngine.h \
     Global.h \
     SocketWorker.h \
-    NetworkTaskQueue.h \
-    Neighbor.h
+    Neighbor.h \
+    NetworkTask.h \
+    NetworkTaskQueue.h
 
 FORMS    += mainwindow.ui
 
