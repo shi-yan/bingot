@@ -1,10 +1,15 @@
 #include "SocketWorker.h"
 #include <QCoreApplication>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include "NetworkEngine.h"
 
-SocketWorker::SocketWorker(NetworkTaskQueue *taskQueue)
+SocketWorker::SocketWorker(NetworkTaskQueue *taskQueue, NetworkEngine *engine)
     :QThread(),
       m_taskQueue(taskQueue),
+      m_networkEngine(engine),
       m_hasTaskFinished(false),
       m_stop(false),
       m_socket(NULL),
@@ -112,5 +117,39 @@ void SocketWorker::onSocketDisconnected()
 
 void SocketWorker::handleIncommingMessage(QByteArray json)
 {
+    QJsonParseError error;
+    QJsonDocument jdoc;
 
+    jdoc.fromJson(json, &error);
+
+    if (error.error == QJsonParseError::NoError)
+    {
+        if (jdoc.isObject())
+        {
+            QJsonObject obj = jdoc.object();
+
+            if (obj.contains("message"))
+            {
+                QString message = obj["message"].toString();
+
+                if (message == "PeerSync")
+                {
+                    QByteArray peers = m_networkEngine->getPeerAddressJson();
+                }
+            }
+            else
+            {
+                qDebug() << "ill-formed json message";
+            }
+        }
+        else
+        {
+            qDebug() << "ill-formed json message";
+        }
+    }
+    else
+    {
+        qDebug() << "ill-formed json message";
+
+    }
 }
