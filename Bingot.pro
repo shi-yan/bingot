@@ -40,8 +40,11 @@ HEADERS  += MainWindow.h \
 
 FORMS    += mainwindow.ui
 
-INCLUDEPATH += ../cryptopp
 
-LIBS += -L../cryptopp \
-        -lcryptopp
 
+macx: LIBS += -L$$PWD/../code/cryptopp562/ -lcryptopp
+
+INCLUDEPATH += $$PWD/../code/cryptopp562
+DEPENDPATH += $$PWD/../code/cryptopp562
+
+macx: PRE_TARGETDEPS += $$PWD/../code/cryptopp562/libcryptopp.a

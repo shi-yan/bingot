@@ -48,7 +48,7 @@ void Bingot::generateECDSAKeyPair()
     result = publicKey.Validate( autoSeededRandomPool, 3 );
     if( !result )
     {
-        qDebug() << "public key is not valide!";
+        qDebug() << "public key is not valid!";
         return;
     }
 

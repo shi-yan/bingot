@@ -22,6 +22,21 @@ public:
 
     void initialize();
 
+    const QByteArray address() const
+    {
+        return m_address;
+    }
+
+    const QByteArray privateKey() const
+    {
+        return m_privateKey;
+    }
+
+    const QByteArray publicKey() const
+    {
+        return m_publicKey;
+    }
+
 signals:
 
 public slots:
