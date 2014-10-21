@@ -15,7 +15,7 @@ const QHostAddress &Peer::getAddress() const
     return m_address;
 }
 
-const unsigned short Peer::getPort() const
+unsigned short Peer::getPort() const
 {
     return m_port;
 }
@@ -24,6 +24,26 @@ void Peer::operator =(const Peer &in)
 {
     m_address = in.m_address;
     m_port = in.m_port;
+}
+
+bool Peer::operator==(const Peer &in)
+{
+    return (in.m_address == m_address) && (in.m_port == m_port);
+}
+
+bool operator==(const Peer &a, const Peer &b)
+{
+    return (a.m_address == b.m_address) && (a.m_port == b.m_port);
+}
+
+uint qhash(const Peer &in)
+{
+    return in.m_address.toIPv4Address();
+}
+
+uint qHash(const Peer &key, uint seed)
+{
+    return key.m_address.toIPv4Address() ^ seed;
 }
 
 NetworkEngine::NetworkEngine()
@@ -47,6 +67,9 @@ void NetworkEngine::initialize()
         m_socketWorkerList.push_back(worker);
         worker->start();
     }
+
+    connect(&m_peerTimer, SIGNAL(timeout()), this, SLOT(onPeerTimerTimeout()));
+    m_peerTimer.start(600000);
 }
 
 void NetworkEngine::incomingConnection(qintptr socketId)
@@ -85,6 +108,43 @@ QByteArray NetworkEngine::getPeerAddressJson()
 
     m_peerAddressesMutex.unlock();
 
-    QJsonDocument jdoc(jarray);
+    QJsonObject jobj;
+
+    jobj["message"] = "PeerSyncReply";
+    jobj["peers"] = jarray;
+
+    QJsonDocument jdoc(jobj);
     return jdoc.toJson();
+}
+
+void NetworkEngine::onPeerTimerTimeout()
+{
+    qDebug() << "query for new peers";
+
+    QByteArray message;
+
+    QJsonObject obj;
+    obj["message"] = "PeerSync";
+    QJsonDocument jdoc(obj);
+
+    message.append(jdoc.toJson());
+    message.prepend((quint32) message.size());
+
+    m_peerAddressesMutex.lock();
+    foreach(Peer peer, m_peerAddresses)
+    {
+        SendTask *task = new SendTask(message, peer.getAddress(), peer.getPort());
+        m_taskQueue->pushTask(task);
+    }
+    m_peerAddressesMutex.unlock();
+
+}
+
+void NetworkEngine::addPeer(const Peer& in)
+{
+    m_peerAddressesMutex.lock();
+
+    m_peerAddresses.insert(in);
+
+    m_peerAddressesMutex.unlock();
 }

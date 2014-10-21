@@ -3,6 +3,7 @@
 # Project created by QtCreator 2014-08-14T09:49:22
 #
 #-------------------------------------------------
+QMAKE_MAC_SDK = macosx10.9
 
 QT       += core gui network
 

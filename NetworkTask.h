@@ -2,6 +2,7 @@
 #define NETWORKTASK_H
 
 #include <QObject>
+#include <QHostAddress>
 
 class NetworkTask : public QObject
 {
@@ -22,9 +23,18 @@ public:
 class SendTask : public NetworkTask
 {
 public:
-    SendTask();
+    SendTask(const QByteArray &message, const QHostAddress &ip, const unsigned short port);
 
     TaskType getType();
+
+    const QByteArray &getMessage();
+    const QHostAddress &getIp();
+    unsigned short getPort();
+
+private:
+    QByteArray m_message;
+    QHostAddress m_ip;
+    unsigned short m_port;
 };
 
 class ReceiveTask : public NetworkTask

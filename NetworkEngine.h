@@ -9,6 +9,7 @@
 #include "NetworkTaskQueue.h"
 #include <QHostAddress>
 #include <QSet>
+#include <QTimer>
 
 class Peer
 {
@@ -19,10 +20,22 @@ private:
 public:
     Peer(const QHostAddress &address = QHostAddress::Any, unsigned int port = 0);
     const QHostAddress &getAddress() const;
-    const unsigned short getPort() const;
+    unsigned short getPort() const;
 
     void operator=(const Peer &in);
+    bool operator==(const Peer &in);
+
+    friend bool operator==(const Peer &a, const Peer &b);
+    friend uint qhash(const Peer &in);
+    friend uint qHash(const Peer &key, uint seed);
+
 };
+
+bool operator==(const Peer &a, const Peer &b);
+
+inline uint qhash(const Peer &in);
+
+inline uint qHash(const Peer &key, uint seed);
 
 class NetworkEngine : public QTcpServer
 {
@@ -34,6 +47,7 @@ public:
     ~NetworkEngine();
 
     QByteArray getPeerAddressJson();
+    void addPeer(const Peer& in);
 
 private:
     QList<Neighbor> m_neighborList;
@@ -42,6 +56,11 @@ private:
 
     QMutex m_peerAddressesMutex;
     QSet<Peer> m_peerAddresses;
+
+    QTimer m_peerTimer;
+
+private slots:
+    void onPeerTimerTimeout();
 };
 
 #endif // NETWORKENGINE_H

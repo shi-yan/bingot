@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonObject>
+#include <QJsonArray>
 #include "NetworkEngine.h"
 
 SocketWorker::SocketWorker(NetworkTaskQueue *taskQueue, NetworkEngine *engine)
@@ -45,6 +46,7 @@ void SocketWorker::run()
         switch(task->getType())
         {
         case NetworkTask::SEND:
+            sendMessage((SendTask*) task);
             break;
         case NetworkTask::RECEIVE:
             receiveMessage((ReceiveTask*)task);
@@ -78,7 +80,18 @@ void SocketWorker::receiveMessage(ReceiveTask *task)
 
 void SocketWorker::sendMessage(SendTask *task)
 {
+    m_socket = new QTcpSocket(this);
+    m_socket->connectToHost(task->getIp(), task->getPort());
+    connect(m_socket, SIGNAL(readyRead()),this,SLOT(onSocketReadyRead()));
+    m_socket->waitForConnected();
 
+    if (m_socket->state() == QAbstractSocket::ConnectedState)
+    {
+        m_socket->write(task->getMessage());
+    }
+
+    delete task;
+    waitForTaskFinish();
 }
 
 void SocketWorker::onSocketReadyRead()
@@ -135,6 +148,30 @@ void SocketWorker::handleIncommingMessage(QByteArray json)
                 if (message == "PeerSync")
                 {
                     QByteArray peers = m_networkEngine->getPeerAddressJson();
+                    quint32 size = peers.size();
+                    QByteArray replyMessage;
+                    replyMessage.append(size);
+                    replyMessage.append(peers);
+                    m_socket->write(replyMessage);
+                    m_socket->waitForBytesWritten();
+
+                    m_hasTaskFinished = true;
+                }
+                else if(message == "PeerSyncReply")
+                {
+                    QJsonArray peers = obj["peers"].toArray();
+
+                    foreach(QJsonValue val, peers)
+                    {
+                        QJsonObject pObj = val.toObject();
+
+                        QHostAddress ip( pObj["ip"].toString());
+                        unsigned short port = pObj["port"].toInt();
+
+                        Peer p(ip,port);
+
+                        m_networkEngine->addPeer(p);
+                    }
                 }
             }
             else
