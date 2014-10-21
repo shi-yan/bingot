@@ -12,7 +12,10 @@ Transaction::Transaction()
     :m_toAddress(),
       m_fromAddress(),
       m_amount(0),
-      m_type(REWARD)
+      m_type(REWARD),
+      m_signature(),
+      m_publicKey(),
+      m_timeStamp()
 {
 }
 
@@ -20,7 +23,10 @@ Transaction::Transaction(const Transaction &in)
     :m_toAddress(in.m_toAddress),
       m_fromAddress(in.m_fromAddress),
       m_amount(in.m_amount),
-      m_type(in.m_type)
+      m_type(in.m_type),
+      m_signature(in.m_signature),
+      m_publicKey(in.m_publicKey),
+      m_timeStamp(in.m_timeStamp)
 {
 }
 
@@ -28,7 +34,10 @@ Transaction::Transaction(const QByteArray &from, const QByteArray &to, unsigned 
     :m_toAddress(to),
       m_fromAddress(from),
       m_amount(amount),
-      m_type(NORMAL)
+      m_type(NORMAL),
+      m_signature(),
+      m_publicKey(),
+      m_timeStamp(QDateTime::currentDateTime())
 {
 }
 
@@ -36,7 +45,10 @@ Transaction::Transaction(const QByteArray &to)
     :m_toAddress(to),
       m_fromAddress(to),
       m_amount(25),
-      m_type(REWARD)
+      m_type(REWARD),
+      m_signature(),
+      m_publicKey(),
+      m_timeStamp(QDateTime::currentDateTime())
 {
 }
 
@@ -46,6 +58,9 @@ void Transaction::operator=(const Transaction &in)
     m_fromAddress = in.m_fromAddress;
     m_amount = in.m_amount;
     m_type = in.m_type;
+    m_signature = in.m_signature;
+    m_publicKey = in.m_publicKey;
+    m_timeStamp = in.m_timeStamp;
 }
 
 QByteArray Transaction::getJson()
@@ -55,13 +70,14 @@ QByteArray Transaction::getJson()
     obj["from"] = QString::fromUtf8(m_toAddress.toBase64());;
     obj["amount"] = (qint64) m_amount;
     obj["type"] = m_type;
+    obj["time"] = m_timeStamp.toMSecsSinceEpoch();
 
     QJsonDocument jdoc(obj);
 
     return jdoc.toJson();
 }
 
-void Transaction::signTransaction(const QByteArray &privateKeyData)
+void Transaction::signTransaction(const QByteArray &privateKeyData, const QByteArray &publicKey)
 {
     qDebug () << "private key for signing:" << privateKeyData.toHex();
     CryptoPP::AutoSeededRandomPool autoSeededRandomPool;
@@ -100,7 +116,8 @@ void Transaction::signTransaction(const QByteArray &privateKeyData)
     // Sign, and trim signature to actual size
     siglen = signer.SignMessage( autoSeededRandomPool, (const byte*)message.data(), message.size(), (byte*)signature.data() );
 
-    m_signature =QByteArray(signature.data(), siglen);
+    m_signature = QByteArray(signature.data(), siglen);
+    m_publicKey = publicKey;
 }
 
 QByteArray Transaction::getMessageJson()
@@ -116,6 +133,7 @@ QByteArray Transaction::getMessageJson()
 
     obj["content"] = cobj;
     obj["signature"] = QString::fromUtf8(m_signature.toBase64());
+    obj["public_key"] = QString::fromUtf8(m_publicKey.toBase64());
 
     QJsonDocument jdoc(obj);
     return jdoc.toJson();
@@ -161,4 +179,25 @@ bool Transaction::verifySignature(const QByteArray &publicKeyData)
         qDebug() << "Failed to verify signature on message";
         return false;
     }
+}
+
+const QByteArray Transaction::getPublicKey() const
+{
+    return m_publicKey;
+}
+
+const QByteArray Transaction::getSignature() const
+{
+    return m_signature;
+}
+
+bool operator==(const Transaction &a, const Transaction &b)
+{
+    return (a.m_toAddress == b.m_toAddress) &&
+       (a.m_fromAddress == b.m_fromAddress) &&
+                 (a.m_amount == b.m_amount) &&
+                     (a.m_type == b.m_type) &&
+           (a.m_signature == b.m_signature) &&
+           (a.m_publicKey == b.m_publicKey) &&
+           (a.m_timeStamp == b.m_timeStamp);
 }

@@ -3,6 +3,7 @@
 
 #include <QByteArray>
 #include <QString>
+#include <QDateTime>
 
 class Transaction
 {
@@ -20,13 +21,19 @@ public:
 
     void operator=(const Transaction &in);
 
+    friend bool operator==(const Transaction &a, const Transaction &b);
+
     QByteArray getJson();
 
     QByteArray getMessageJson();
 
-    void signTransaction(const QByteArray &privateKey);
+    void signTransaction(const QByteArray &privateKey, const QByteArray &publicKey);
 
     bool verifySignature(const QByteArray &publicKey);
+
+    const QByteArray getPublicKey() const;
+
+    const QByteArray getSignature() const;
 
 private:
     QByteArray m_toAddress;
@@ -35,6 +42,10 @@ private:
     TransactionType m_type;
 
     QByteArray m_signature;
+    QByteArray m_publicKey;
+    QDateTime m_timeStamp;
 };
+
+bool operator==(const Transaction &a, const Transaction &b);
 
 #endif // TRANSACTION_H

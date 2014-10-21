@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     b.initialize();
 
     Transaction t(b.address());
-    t.signTransaction(b.privateKey());
+    t.signTransaction(b.privateKey(), b.publicKey());
 
     qDebug() << t.getMessageJson();
 

@@ -100,6 +100,12 @@ void Bingot::generateWalletAddress()
 
     m_address = a1.toBase64();
     qDebug() << "final address" << m_address;
+}
 
+void Bingot::Transfer(const QByteArray &toAddress, unsigned int amount)
+{
+    Transaction t(address(), toAddress, amount);
+    t.signTransaction(privateKey(), publicKey());
 
+    m_suggestedTransaction.insertMulti(t.getSignature(), t);
 }
