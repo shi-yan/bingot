@@ -43,6 +43,8 @@ public:
 
     void Transfer(const QByteArray &address, unsigned int amount);
 
+
+
 signals:
 
 public slots:

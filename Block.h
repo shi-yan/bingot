@@ -3,19 +3,21 @@
 
 #include <QObject>
 #include <QByteArray>
+#include <QHash>
+#include "Transaction.h"
 
-class Block : public QObject
+class Block
 {
-    Q_OBJECT
-
     QByteArray m_preHash;
 
+    QHash<QByteArray, Transaction> m_transactions;
+
+    quint64 m_solution;
+
+
 public:
-    explicit Block(QObject *parent = 0);
+    explicit Block();
 
-signals:
-
-public slots:
 
 };
 

@@ -3,3 +3,13 @@
 Miner::Miner()
 {
 }
+
+void Miner::run()
+{
+
+    while(1)
+    {
+
+    }
+    exec();
+}
