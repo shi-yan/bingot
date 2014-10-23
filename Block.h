@@ -12,13 +12,20 @@ class Block
 
     QHash<QByteArray, Transaction> m_transactions;
 
+    //I'm not sure if 64bit integer is enough
     quint64 m_solution;
 
+    int m_index;
 
 public:
-    explicit Block();
+    explicit Block(int index);
 
+    QByteArray toJson() const;
 
+    void addTransaction(const Transaction &t);
+    void removeTransaction(const Transaction &t);
+    int getIndex() const;
+    void setSolution(quint64 solution);
 };
 
 #endif // BLOCK_H
