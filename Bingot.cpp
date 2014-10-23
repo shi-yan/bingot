@@ -117,6 +117,8 @@ void Bingot::startNewMiningRound()
     m_candidateBlock = newCandidateBlock;
     m_candidateBlock.addTransaction(Transaction(address()));
 
+    m_suggestedTransactions.clear();
+
     const unsigned int workerThreadCount = QThread::idealThreadCount();
 
     quint64 value = Q_UINT64_C(932838457459459);
@@ -129,4 +131,32 @@ void Bingot::startNewMiningRound()
         m_miners.push_back(miner);
         miner->start();
     }
+}
+
+void Bingot::newBlockReceived(Block b)
+{
+    if (b.isValid())
+    {
+        if (b.getIndex() == m_blockChain.size())
+        {
+
+           if( m_blockChain.add(b)){
+//check prehash
+            //recycle m_candidateBlock to m_suggestedTransactions;
+
+            //remove m_suggestedTransactions that are in blockChain already
+
+            startNewMiningRound();}
+
+        }
+        else if(b.getIndex() < m_blockChain.size())
+        {
+            m_blockChain.add(b);
+        }
+    }
+}
+
+void Bingot::newBlockSolved(Block b)
+{
+    m_blockChain.add(b);
 }

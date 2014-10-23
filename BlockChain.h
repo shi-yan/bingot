@@ -2,10 +2,16 @@
 #define BLOCKCHAIN_H
 
 #include <QObject>
+#include <QVector>
+#include "Block.h"
 
 class BlockChain : public QObject
 {
     Q_OBJECT
+
+private:
+    QVector<QVector<Block> > m_chain;
+
 public:
     explicit BlockChain(QObject *parent = 0);
 

@@ -49,9 +49,13 @@ public:
 
     void startNewMiningRound();
 
+
+
 signals:
 
 public slots:
+    void newBlockReceived(Block b);
+    void newBlockSolved(Block b);
 
 private:
     void generateECDSAKeyPair();

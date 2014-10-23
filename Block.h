@@ -27,6 +27,7 @@ public:
     void removeTransaction(const Transaction &t);
     int getIndex() const;
     void setSolution(quint64 solution);
+    bool isValid();
 };
 
 #endif // BLOCK_H

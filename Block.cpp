@@ -53,3 +53,8 @@ void Block::setSolution(quint64 solution)
 {
     m_solution = solution;
 }
+
+bool Block::isValid()
+{
+
+}
