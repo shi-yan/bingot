@@ -9,6 +9,9 @@ class BlockChain : public QObject
 public:
     explicit BlockChain(QObject *parent = 0);
 
+
+    int size();
+    QByteArray getLastBlockHash();
 signals:
 
 public slots:

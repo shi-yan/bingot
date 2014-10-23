@@ -4,9 +4,12 @@
 #include <QObject>
 #include <QByteArray>
 #include <QHash>
+#include <QVector>
 #include "BlockChain.h"
 #include "Block.h"
 #include "Transaction.h"
+#include "BlockChain.h"
+#include "Miner.h"
 
 class Bingot : public QObject
 {
@@ -14,12 +17,13 @@ class Bingot : public QObject
 
     QByteArray m_privateKey;
     QByteArray m_publicKey;
-
     QByteArray m_address;
 
+    QHash<QByteArray, Transaction> m_suggestedTransactions;
+    Block m_candidateBlock;
+    BlockChain m_blockChain;
 
-    QHash<QByteArray, Transaction> m_suggestedTransaction;
-
+    QVector<Miner*> m_miners;
 
 public:
     explicit Bingot(QObject *parent = 0);
@@ -43,7 +47,7 @@ public:
 
     void Transfer(const QByteArray &address, unsigned int amount);
 
-
+    void startNewMiningRound();
 
 signals:
 

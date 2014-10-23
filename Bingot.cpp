@@ -107,5 +107,26 @@ void Bingot::Transfer(const QByteArray &toAddress, unsigned int amount)
     Transaction t(address(), toAddress, amount);
     t.signTransaction(privateKey(), publicKey());
 
-    m_suggestedTransaction.insertMulti(t.getSignature(), t);
+    m_suggestedTransactions.insertMulti(t.getSignature(), t);
+}
+
+void Bingot::startNewMiningRound()
+{
+    Block newCandidateBlock(m_blockChain.size(), m_suggestedTransactions, m_blockChain.getLastBlockHash());
+
+    m_candidateBlock = newCandidateBlock;
+    m_candidateBlock.addTransaction(Transaction(address()));
+
+    const unsigned int workerThreadCount = QThread::idealThreadCount();
+
+    quint64 value = Q_UINT64_C(932838457459459);
+    quint64 chunk = value/workerThreadCount;
+
+    for(unsigned int i = 0; i < workerThreadCount; ++i)
+    {
+        Miner *miner = new Miner(m_candidateBlock, chunk*i, chunk*(1+i));
+        miner->moveToThread(miner);
+        m_miners.push_back(miner);
+        miner->start();
+    }
 }

@@ -19,6 +19,7 @@ class Block
 
 public:
     explicit Block(int index);
+    Block(int index, const QHash<QByteArray, Transaction> &transactions, const QByteArray &preHash);
 
     QByteArray toJson() const;
 
