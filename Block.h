@@ -17,6 +17,8 @@ class Block
 
     int m_index;
 
+    QByteArray m_cachedBlockHash;
+
 public:
     Block(int index = 0);
     Block(int index, const QHash<QByteArray, Transaction> &transactions, const QByteArray &preHash);
@@ -31,6 +33,9 @@ public:
     bool isValid();
 
     const QByteArray &getPreHash() const;
+    const QByteArray &getCacheBlockHash();
+
+    void refreshBlockHash();
 
     static unsigned int getTarget(int index);
 };

@@ -154,3 +154,22 @@ const QByteArray &Block::getPreHash() const
     return m_preHash;
 }
 
+void Block::refreshBlockHash()
+{
+    QByteArray messageJson = toMessageJson();
+    QCryptographicHash sha512(QCryptographicHash::Sha3_512);
+
+    sha512.addData(messageJson);
+
+    m_cachedBlockHash = sha512.result();
+}
+
+const QByteArray &Block::getCacheBlockHash()
+{
+    if (m_cachedBlockHash.isEmpty())
+    {
+        refreshBlockHash();
+    }
+
+    return m_cachedBlockHash;
+}

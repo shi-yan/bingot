@@ -21,6 +21,8 @@ public:
 
     bool add(const Block &b);
 
+    void prune();
+
 private:
     const QVector<Block> &at(int index);
 
