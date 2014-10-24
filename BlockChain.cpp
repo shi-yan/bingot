@@ -13,3 +13,8 @@ int BlockChain::size()
 QByteArray BlockChain::getLastBlockHash()
 {}
 
+
+bool BlockChain::add(const Block &b)
+{
+
+}

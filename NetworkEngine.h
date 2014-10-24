@@ -4,7 +4,6 @@
 #include <QTcpServer>
 #include <QList>
 #include <QVector>
-#include "Neighbor.h"
 #include "SocketWorker.h"
 #include "NetworkTaskQueue.h"
 #include <QHostAddress>
@@ -50,7 +49,6 @@ public:
     void addPeer(const Peer& in);
 
 private:
-    QList<Neighbor> m_neighborList;
     QVector<SocketWorker*> m_socketWorkerList;
     NetworkTaskQueue *m_taskQueue;
 

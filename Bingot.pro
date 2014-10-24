@@ -22,7 +22,6 @@ SOURCES += main.cpp\
     Miner.cpp \
     NetworkEngine.cpp \
     SocketWorker.cpp \
-    Neighbor.cpp \
     NetworkTask.cpp \
     NetworkTaskQueue.cpp
 
@@ -33,9 +32,7 @@ HEADERS  += MainWindow.h \
     Transaction.h \
     Miner.h \
     NetworkEngine.h \
-    Global.h \
     SocketWorker.h \
-    Neighbor.h \
     NetworkTask.h \
     NetworkTaskQueue.h
 

@@ -1,4 +1,3 @@
-#include "Global.h"
 #include "Bingot.h"
 #include <cryptlib.h>
 #include <osrng.h>
@@ -8,8 +7,11 @@
 
 #include <QCryptographicHash>
 
+const unsigned int protocol_version = 1;
+
 Bingot::Bingot(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_candidateBlock(0)
 {
 }
 
@@ -140,13 +142,15 @@ void Bingot::newBlockReceived(Block b)
         if (b.getIndex() == m_blockChain.size())
         {
 
-           if( m_blockChain.add(b)){
+           if( m_blockChain.add(b))
+           {
 //check prehash
             //recycle m_candidateBlock to m_suggestedTransactions;
 
             //remove m_suggestedTransactions that are in blockChain already
 
-            startNewMiningRound();}
+            startNewMiningRound();
+           }
 
         }
         else if(b.getIndex() < m_blockChain.size())

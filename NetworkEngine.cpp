@@ -48,7 +48,6 @@ uint qHash(const Peer &key, uint seed)
 
 NetworkEngine::NetworkEngine()
     :QTcpServer(),
-      m_neighborList(),
       m_socketWorkerList(),
       m_taskQueue(NULL)
 {

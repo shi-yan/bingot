@@ -18,6 +18,8 @@ public:
 
     int size();
     QByteArray getLastBlockHash();
+
+    bool add(const Block &b);
 signals:
 
 public slots:

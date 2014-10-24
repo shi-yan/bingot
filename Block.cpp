@@ -11,6 +11,9 @@ Block::Block(int index)
 {
 }
 
+Block::Block(int index, const QHash<QByteArray, Transaction> &transactions, const QByteArray &preHash)
+{}
+
 QByteArray Block::toJson() const
 {
     QJsonObject jobj;
@@ -27,7 +30,10 @@ QByteArray Block::toJson() const
 
     jobj["transactions"] = jarr;
 
-    jobj["solution"] = m_solution;
+    QByteArray solutionArray;
+    solutionArray.append((char*)&m_solution, sizeof(m_solution));
+
+    jobj["solution"] = QString::fromUtf8(solutionArray.toBase64());
 
     QJsonDocument jdoc(jobj);
 
