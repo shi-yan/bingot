@@ -191,6 +191,11 @@ const QByteArray Transaction::getSignature() const
     return m_signature;
 }
 
+Transaction::TransactionType Transaction::getType() const
+{
+    return m_type;
+}
+
 bool operator==(const Transaction &a, const Transaction &b)
 {
     return (a.m_toAddress == b.m_toAddress) &&

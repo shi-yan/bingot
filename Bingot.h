@@ -49,8 +49,6 @@ public:
 
     void startNewMiningRound();
 
-
-
 signals:
 
 public slots:

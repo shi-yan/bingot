@@ -144,12 +144,12 @@ void Bingot::newBlockReceived(Block b)
 
            if( m_blockChain.add(b))
            {
-//check prehash
-            //recycle m_candidateBlock to m_suggestedTransactions;
+                //check prehash
+                //recycle m_candidateBlock to m_suggestedTransactions;
 
-            //remove m_suggestedTransactions that are in blockChain already
+                //remove m_suggestedTransactions that are in blockChain already
 
-            startNewMiningRound();
+                startNewMiningRound();
            }
 
         }

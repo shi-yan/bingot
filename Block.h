@@ -18,16 +18,21 @@ class Block
     int m_index;
 
 public:
-    explicit Block(int index);
+    Block(int index = 0);
     Block(int index, const QHash<QByteArray, Transaction> &transactions, const QByteArray &preHash);
 
     QByteArray toJson() const;
+    QByteArray toMessageJson() const;
 
     void addTransaction(const Transaction &t);
     void removeTransaction(const Transaction &t);
     int getIndex() const;
     void setSolution(quint64 solution);
     bool isValid();
+
+    const QByteArray &getPreHash() const;
+
+    static unsigned int getTarget(int index);
 };
 
 #endif // BLOCK_H

@@ -2,6 +2,12 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QCryptographicHash>
+
+unsigned int Block::getTarget(int index)
+{
+    return index / 5 + 6;
+}
 
 Block::Block(int index)
     :m_index(index),
@@ -12,13 +18,20 @@ Block::Block(int index)
 }
 
 Block::Block(int index, const QHash<QByteArray, Transaction> &transactions, const QByteArray &preHash)
-{}
+    :m_index(index),
+      m_transactions(transactions),
+      m_preHash(preHash),
+      m_solution(0)
+{
+
+}
 
 QByteArray Block::toJson() const
 {
     QJsonObject jobj;
 
     jobj["prehash"] = QString::fromUtf8(m_preHash.toBase64());
+    jobj["index"] = m_index;
 
     QJsonArray jarr;
 
@@ -33,9 +46,42 @@ QByteArray Block::toJson() const
     QByteArray solutionArray;
     solutionArray.append((char*)&m_solution, sizeof(m_solution));
 
-    jobj["solution"] = QString::fromUtf8(solutionArray.toBase64());
+    //jobj["solution"] = QString::fromUtf8(solutionArray.toBase64());
 
     QJsonDocument jdoc(jobj);
+
+    return jdoc.toJson();
+}
+
+QByteArray Block::toMessageJson() const
+{
+    QJsonObject jobj;
+
+    jobj["prehash"] = QString::fromUtf8(m_preHash.toBase64());
+    jobj["index"] = m_index;
+
+    QJsonArray jarr;
+
+    foreach(Transaction t, m_transactions)
+    {
+        QJsonObject tobj = QJsonDocument::fromJson( t.getMessageJson()).object();
+        jarr.append(tobj);
+    }
+
+    jobj["transactions"] = jarr;
+
+    QByteArray solutionArray;
+    solutionArray.append((char*)&m_solution, sizeof(m_solution));
+
+    //jobj["solution"] = QString::fromUtf8(solutionArray.toBase64());
+
+    QJsonObject messageJsonObj;
+
+    messageJsonObj["message"] = "Block";
+    messageJsonObj["block"] = jobj;
+    messageJsonObj["solution"] = QString::fromUtf8(solutionArray.toBase64());
+
+    QJsonDocument jdoc(messageJsonObj);
 
     return jdoc.toJson();
 }
@@ -62,5 +108,49 @@ void Block::setSolution(quint64 solution)
 
 bool Block::isValid()
 {
+    //verify solution
+    QByteArray blockJson = toJson();
 
+    QByteArray data;
+    data.push_back(m_solution);
+    data.push_back(blockJson);
+    QCryptographicHash sha512(QCryptographicHash::Sha3_512);
+
+    sha512.addData(data);
+
+    QByteArray result = sha512.result().toHex();
+
+    int zeroCount = 0;
+    while(result.at(zeroCount) == '0')
+    {
+        zeroCount++;
+    }
+
+    unsigned int target = Block::getTarget(m_index);
+
+    if (zeroCount < target)
+    {
+        return false;
+    }
+
+    //check if there is only one reward transaction;
+    int rewardTransactionCount = 0;
+    foreach(Transaction t, m_transactions)
+    {
+        if (t.getType() == Transaction::REWARD)
+        {
+            ++ rewardTransactionCount;
+        }
+    }
+
+    if (rewardTransactionCount != 1)
+    {
+        return false;
+    }
 }
+
+const QByteArray &Block::getPreHash() const
+{
+    return m_preHash;
+}
+

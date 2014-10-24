@@ -9,7 +9,7 @@ Miner::Miner(const Block &blockToSolve, quint64 begin, quint64 end)
       m_target(0),
       m_solved(false)
 {
-    m_target = m_blockToSolve.getIndex() / 5 + 6;
+    m_target = Block::getTarget(m_blockToSolve.getIndex());
 }
 
 void Miner::run()

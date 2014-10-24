@@ -35,6 +35,8 @@ public:
 
     const QByteArray getSignature() const;
 
+    TransactionType getType() const;
+
 private:
     QByteArray m_toAddress;
     QByteArray m_fromAddress;

@@ -20,6 +20,10 @@ public:
     QByteArray getLastBlockHash();
 
     bool add(const Block &b);
+
+private:
+    const QVector<Block> &at(int index);
+
 signals:
 
 public slots:
