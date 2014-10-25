@@ -7,9 +7,6 @@
 
 #include <QCryptographicHash>
 
-//verify thread can stop
-//ui
-
 const unsigned int protocol_version = 1;
 
 Bingot::Bingot(QObject *parent) :

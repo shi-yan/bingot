@@ -14,7 +14,6 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        MainWindow.cpp \
     Bingot.cpp \
     BlockChain.cpp \
     Block.cpp \
@@ -26,7 +25,7 @@ SOURCES += main.cpp\
     NetworkTaskQueue.cpp \
     BigInt.cpp
 
-HEADERS  += MainWindow.h \
+HEADERS  += \
     Bingot.h \
     BlockChain.h \
     Block.h \
@@ -38,7 +37,7 @@ HEADERS  += MainWindow.h \
     NetworkTaskQueue.h \
     BigInt.h
 
-FORMS    += mainwindow.ui
+FORMS    +=
 
 
 
