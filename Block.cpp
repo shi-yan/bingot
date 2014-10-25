@@ -7,11 +7,13 @@
 
 unsigned int Block::getTarget(int index)
 {
-    return index / 5 + 20;
+    return index / 1024 + 20;
 
     //155
     //500
     //2.49
+    //42
+    //429
 
 }
 
