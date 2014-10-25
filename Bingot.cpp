@@ -7,6 +7,13 @@
 
 #include <QCryptographicHash>
 
+//large integer
+//count binary 0 instead of hex 0
+//parse receive block
+//request block
+//verify thread can stop
+//ui
+
 const unsigned int protocol_version = 1;
 
 Bingot::Bingot(QObject *parent) :
@@ -250,7 +257,7 @@ void Bingot::newBlockReceived(Block b)
 
 void Bingot::newBlockSolved(Block b)
 {
-    if(m_blockChain.add(b))
+    if(b.getIndex()==size() && m_blockChain.add(b))
     {
         m_networkEngine->sendMessage(b.toMessageJson());
     }
