@@ -40,6 +40,8 @@ public:
     void refreshBlockHash();
 
     static unsigned int getTarget(int index);
+
+    bool parseFromQJsonObject(const QJsonObject &obj);
 };
 
 #endif // BLOCK_H

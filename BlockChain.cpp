@@ -116,7 +116,7 @@ void BlockChain::prune()
     }
 }
 
-BlockChain::TransactionState BlockChain::getTransactionState(const Transaction &t)
+BlockChain::TransactionState BlockChain::getTransactionState(const Transaction &t, unsigned int &total)
 {
     if (t.getAmount() == 0 || size() == 0)
     {
@@ -125,7 +125,7 @@ BlockChain::TransactionState BlockChain::getTransactionState(const Transaction &
     else
     if (size() > 0)
     {
-        unsigned int total = 0;
+        total = 0;
 
         QByteArray preHash;
         for(int i = size() - 1; i>=0; ++i)

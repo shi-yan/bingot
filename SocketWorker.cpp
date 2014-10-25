@@ -173,6 +173,14 @@ void SocketWorker::handleIncommingMessage(QByteArray json)
                         m_networkEngine->addPeer(p);
                     }
                 }
+                else if(message == "Transaction")
+                {
+                    Transaction t;
+                    if (t.parseFromJsonObject(obj))
+                    {
+                        emit newTransaction(t);
+                    }
+                }
             }
             else
             {

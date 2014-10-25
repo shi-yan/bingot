@@ -29,7 +29,7 @@ public:
 
     void signTransaction(const QByteArray &privateKey, const QByteArray &publicKey);
 
-    bool verifySignature(const QByteArray &publicKey);
+    bool verifySignature();
 
     const QByteArray getPublicKey() const;
 
@@ -40,6 +40,8 @@ public:
     const QByteArray getToAddress() const;
     const QByteArray getFromAddress() const;
     unsigned int getAmount() const;
+
+    bool parseFromJsonObject(const QJsonObject &messageJson);
 
 private:
     QByteArray m_toAddress;

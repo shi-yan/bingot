@@ -10,6 +10,7 @@
 #include "Transaction.h"
 #include "BlockChain.h"
 #include "Miner.h"
+#include "NetworkEngine.h"
 
 class Bingot : public QObject
 {
@@ -24,6 +25,8 @@ class Bingot : public QObject
     BlockChain m_blockChain;
 
     QVector<Miner*> m_miners;
+
+    NetworkEngine *m_networkEngine;
 
 public:
     explicit Bingot(QObject *parent = 0);
@@ -56,10 +59,12 @@ signals:
 public slots:
     void newBlockReceived(Block b);
     void newBlockSolved(Block b);
+    void onNewTransaction(Transaction t);
 
 private:
     void generateECDSAKeyPair();
     void generateWalletAddress();
+    void queryForBlock(int index);
 
 };
 

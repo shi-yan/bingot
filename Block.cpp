@@ -178,3 +178,8 @@ const QHash<QByteArray, Transaction> &Block::getTransactions() const
 {
     return m_transactions;
 }
+
+bool Block::parseFromQJsonObject(const QJsonObject &obj)
+{
+
+}

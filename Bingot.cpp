@@ -11,12 +11,15 @@ const unsigned int protocol_version = 1;
 
 Bingot::Bingot(QObject *parent) :
     QObject(parent),
-    m_candidateBlock(0)
+    m_candidateBlock(0),
+    m_networkEngine()
 {
 }
 
 void Bingot::initialize()
 {
+    m_networkEngine = new NetworkEngine();
+    m_networkEngine->listen(QHostAddress::Any, 42231);
     generateECDSAKeyPair();
     generateWalletAddress();
 }
@@ -106,6 +109,11 @@ void Bingot::generateWalletAddress()
 
 void Bingot::Transfer(const QByteArray &toAddress, unsigned int amount)
 {
+    if (toAddress == m_address)
+    {
+        return;
+    }
+
     int total = m_blockChain.getAccountAmount(m_address);
 
     foreach(const Transaction &t, m_suggestedTransactions)
@@ -131,6 +139,7 @@ void Bingot::Transfer(const QByteArray &toAddress, unsigned int amount)
         Transaction t(address(), toAddress, amount);
         t.signTransaction(privateKey(), publicKey());
         m_suggestedTransactions.insert(t.getSignature(), t);
+        m_networkEngine->sendMessage(t.getMessageJson());
     }
 }
 
@@ -148,6 +157,12 @@ void Bingot::startNewMiningRound()
     quint64 value = Q_UINT64_C(932838457459459);
     quint64 chunk = value/workerThreadCount;
 
+    foreach(Miner *miner, m_miners)
+    {
+        miner->quit(); //is this enough to stop miner?
+        miner->deleteLater();
+    }
+
     for(unsigned int i = 0; i < workerThreadCount; ++i)
     {
         Miner *miner = new Miner(m_candidateBlock, chunk*i, chunk*(1+i));
@@ -163,7 +178,6 @@ void Bingot::newBlockReceived(Block b)
     {
         if (b.getIndex() == m_blockChain.size())
         {
-
            if( m_blockChain.add(b))
            {
                 //recycle m_candidateBlock to m_suggestedTransactions;
@@ -176,6 +190,49 @@ void Bingot::newBlockReceived(Block b)
 
                 //remove m_suggestedTransactions that are in blockChain already
 
+                QVector<Transaction> keepTransactions;
+
+                foreach(Transaction &t, m_suggestedTransactions)
+                {
+                    unsigned int total = 0;
+                    BlockChain::TransactionState ts = m_blockChain.getTransactionState(t, total);
+
+                    if (ts == BlockChain::VALID)
+                    {
+                        foreach(const Transaction &tr, m_suggestedTransactions)
+                        {
+                            if ((tr.getType() != Transaction::REWARD) && (tr.getFromAddress() == m_address))
+                            {
+                                total -= tr.getAmount();
+                            }
+                        }
+
+                        const QHash<QByteArray, Transaction> &candidateTransactions = m_candidateBlock.getTransactions();
+
+                        for(QHash<QByteArray, Transaction>::const_iterator iter = candidateTransactions.begin(); iter != candidateTransactions.end(); ++iter)
+                        {
+                            if ((iter->getType() != Transaction::REWARD && (iter->getFromAddress() == m_address)))
+                            {
+                                total -= iter->getAmount();
+                            }
+                        }
+
+                        if (total > t.getAmount())
+                        {
+                            //accept;
+                            keepTransactions.push_back(t);
+                        }
+
+                    }
+                }
+
+                m_suggestedTransactions.clear();
+
+                foreach(Transaction t, keepTransactions)
+                {
+                   m_suggestedTransactions.insert(t.getSignature(), t);
+                }
+
                 startNewMiningRound();
            }
 
@@ -184,10 +241,87 @@ void Bingot::newBlockReceived(Block b)
         {
             m_blockChain.add(b);
         }
+        else if(b.getIndex() > m_blockChain.size())
+        {
+            //ask for blocks
+        }
     }
 }
 
 void Bingot::newBlockSolved(Block b)
 {
-    m_blockChain.add(b);
+    if(m_blockChain.add(b))
+    {
+        m_networkEngine->sendMessage(b.toMessageJson());
+    }
+}
+
+void Bingot::onNewTransaction(Transaction t)
+{
+    if (t.getType() == Transaction::REWARD)
+    {
+        return; //reward transaction can only be part of solved block.
+    }
+
+    if (t.getToAddress() == t.getFromAddress())
+    {
+        return; //can't self transfer;
+    }
+
+    if (!t.verifySignature())
+    {
+        return;
+    }
+
+    //check transaction uniqueness,
+    unsigned int total = 0;
+    BlockChain::TransactionState ts = m_blockChain.getTransactionState(t, total);
+
+    if (ts == BlockChain::EXISITING || ts == BlockChain::NOT_ENOUGH_MONEY)
+    {
+        return;
+    }
+
+    if (ts == BlockChain::VALID)
+    {
+        foreach(const Transaction &tr, m_suggestedTransactions)
+        {
+            if (tr.getSignature() == t.getSignature())
+            {
+                return;
+            }
+            if ((tr.getType() != Transaction::REWARD) && (tr.getFromAddress() == m_address))
+            {
+                total -= tr.getAmount();
+            }
+        }
+
+        const QHash<QByteArray, Transaction> &candidateTransactions = m_candidateBlock.getTransactions();
+
+        for(QHash<QByteArray, Transaction>::const_iterator iter = candidateTransactions.begin(); iter != candidateTransactions.end(); ++iter)
+        {
+            if (iter->getSignature() == t.getSignature())
+            {
+                return;
+            }
+            if ((iter->getType() != Transaction::REWARD && (iter->getFromAddress() == m_address)))
+            {
+                total -= iter->getAmount();
+            }
+        }
+
+        if (total > t.getAmount())
+        {
+            //accept;
+            m_suggestedTransactions.insert(t.getSignature(), t);
+            //need to figure out a way to avoid sending this message to where it is from
+            m_networkEngine->sendMessage(t.getMessageJson());
+        }
+
+    }
+}
+
+void Bingot::queryForBlock(int index)
+{
+
 }

@@ -30,7 +30,7 @@ public:
 
     void prune();
 
-    TransactionState getTransactionState(const Transaction &t);
+    TransactionState getTransactionState(const Transaction &t, unsigned int &amount);
 
     unsigned int getAccountAmount(const QByteArray &toAddress);
 

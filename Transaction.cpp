@@ -139,12 +139,26 @@ QByteArray Transaction::getMessageJson()
     return jdoc.toJson();
 }
 
-bool Transaction::verifySignature(const QByteArray &publicKeyData)
+bool Transaction::parseFromJsonObject(const QJsonObject &messageJson)
+{
+    QJsonObject cobj = messageJson["content"].toObject();
+    m_toAddress =  QByteArray::fromBase64(cobj["to"].toString());
+    m_fromAddress = QByteArray::fromBase64(cobj["from"].toString());
+    m_amount = cobj["amount"].toInt();
+    m_type = (TransactionType) cobj["type"].toInt();
+    m_signature = QByteArray::fromBase64(messageJson["signature"].toString());
+    m_publicKey = QByteArray::fromBase64(messageJson["public_key"].toString());
+
+    return true;
+}
+
+
+bool Transaction::verifySignature()
 {
     CryptoPP::AutoSeededRandomPool autoSeededRandomPool;
 
-    QByteArray xData = publicKeyData.left(publicKeyData.size() / 2);
-    QByteArray yData = publicKeyData.right(publicKeyData.size() / 2);
+    QByteArray xData = m_publicKey.left(m_publicKey.size() / 2);
+    QByteArray yData = m_publicKey.right(m_publicKey.size() / 2);
 
     qDebug() << xData.toHex() << yData.toHex();
 

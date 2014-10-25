@@ -2,6 +2,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include "Bingot.h"
 
 Peer::Peer(const QHostAddress &address, unsigned int port)
     :m_address(address),
@@ -53,7 +54,7 @@ NetworkEngine::NetworkEngine()
 {
 }
 
-void NetworkEngine::initialize()
+void NetworkEngine::initialize(Bingot *bingot)
 {
     m_taskQueue = new NetworkTaskQueue();
 
@@ -62,6 +63,7 @@ void NetworkEngine::initialize()
     for(unsigned int i = 0; i < workerThreadCount; ++i)
     {
         SocketWorker *worker = new SocketWorker(m_taskQueue, this);
+        connect(worker,SIGNAL(newTransaction(Transaction)),bingot,SLOT(onNewTransaction(Transaction)));
         worker->moveToThread(worker);
         m_socketWorkerList.push_back(worker);
         worker->start();
@@ -126,17 +128,7 @@ void NetworkEngine::onPeerTimerTimeout()
     obj["message"] = "PeerSync";
     QJsonDocument jdoc(obj);
 
-    message.append(jdoc.toJson());
-    message.prepend((quint32) message.size());
-
-    m_peerAddressesMutex.lock();
-    foreach(Peer peer, m_peerAddresses)
-    {
-        SendTask *task = new SendTask(message, peer.getAddress(), peer.getPort());
-        m_taskQueue->pushTask(task);
-    }
-    m_peerAddressesMutex.unlock();
-
+    sendMessage(jdoc.toJson());
 }
 
 void NetworkEngine::addPeer(const Peer& in)
@@ -145,5 +137,21 @@ void NetworkEngine::addPeer(const Peer& in)
 
     m_peerAddresses.insert(in);
 
+    m_peerAddressesMutex.unlock();
+}
+
+void NetworkEngine::sendMessage(const QByteArray &msg)
+{
+    QByteArray data;
+
+    data.append((quint32) msg.size());
+    data.append(msg);
+
+    m_peerAddressesMutex.lock();
+    foreach(Peer peer, m_peerAddresses)
+    {
+        SendTask *task = new SendTask(data, peer.getAddress(), peer.getPort());
+        m_taskQueue->pushTask(task);
+    }
     m_peerAddressesMutex.unlock();
 }

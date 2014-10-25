@@ -9,6 +9,9 @@
 #include <QHostAddress>
 #include <QSet>
 #include <QTimer>
+#include "Transaction.h"
+
+class Bingot;
 
 class Peer
 {
@@ -42,11 +45,13 @@ class NetworkEngine : public QTcpServer
 public:
     NetworkEngine();
     void incomingConnection(qintptr socketId);
-    void initialize();
+    void initialize(Bingot *bingot);
     ~NetworkEngine();
 
     QByteArray getPeerAddressJson();
     void addPeer(const Peer& in);
+
+    void sendMessage(const QByteArray &msg);
 
 private:
     QVector<SocketWorker*> m_socketWorkerList;

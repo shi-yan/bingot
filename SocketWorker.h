@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QByteArray>
 #include "NetworkTaskQueue.h"
+#include "Transaction.h"
 
 class NetworkEngine;
 class SocketWorker : public QThread
@@ -32,6 +33,9 @@ private:
 
 protected:
     void run();
+
+signals:
+    void newTransaction(Transaction t);
 
 private slots:
     void onSocketReadyRead();
