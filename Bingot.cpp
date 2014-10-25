@@ -106,12 +106,32 @@ void Bingot::generateWalletAddress()
 
 void Bingot::Transfer(const QByteArray &toAddress, unsigned int amount)
 {
-    Transaction t(address(), toAddress, amount);
-    t.signTransaction(privateKey(), publicKey());
+    int total = m_blockChain.getAccountAmount(m_address);
 
-    //verify you actually has this much money;
+    foreach(const Transaction &t, m_suggestedTransactions)
+    {
+        if ((t.getType() != Transaction::REWARD) && (t.getFromAddress() == m_address))
+        {
+            total -= t.getAmount();
+        }
+    }
 
-    m_suggestedTransactions.insert(t.getSignature(), t);
+    const QHash<QByteArray, Transaction> &candidateTransactions = m_candidateBlock.getTransactions();
+
+    for(QHash<QByteArray, Transaction>::const_iterator iter = candidateTransactions.begin(); iter != candidateTransactions.end(); ++iter)
+    {
+        if ((iter->getType() != Transaction::REWARD && (iter->getFromAddress() == m_address)))
+        {
+            total -= iter->getAmount();
+        }
+    }
+
+    if (amount <= total)
+    {
+        Transaction t(address(), toAddress, amount);
+        t.signTransaction(privateKey(), publicKey());
+        m_suggestedTransactions.insert(t.getSignature(), t);
+    }
 }
 
 void Bingot::startNewMiningRound()
