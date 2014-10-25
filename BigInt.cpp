@@ -1,4 +1,5 @@
 #include "BigInt.h"
+#include <QDebug>
 
 BigInt::BigInt(quint64 val)
     :m_data()
@@ -35,20 +36,19 @@ void BigInt::operator =(quint64 val)
 
 void BigInt::increase()
 {
-    for(int i = 0; i < m_data.size(); ++ i)
+    for(int i = 0; i < m_data.size(); ++i)
     {
-        if (m_data.data()[i] < 0xff)
+        if (((unsigned char*) m_data.data())[i] < (unsigned char) 0xff)
         {
-            m_data.data()[i] ++;
+            ((unsigned char*) m_data.data())[i]++;
             return;
         }
         else
         {
-            m_data.data()[i] = 0x0;
+            ((unsigned char*) m_data.data())[i] = 0x0;
         }
     }
-
-    m_data.push_back((char) 0x1);
+    m_data.push_back((unsigned char) 0x1);
 }
 
 const QByteArray BigInt::getData() const

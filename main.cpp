@@ -41,9 +41,14 @@ int main(int argc, char *argv[])
 
     qDebug() << "t2" << t2.getMessageJson();
 
-    BigInt a1(256);
+    BigInt a1(0x1FF);
     qDebug() << "created";
-    qDebug() << Miner::countLeadingZeros(a1.getData());
-
+    qDebug() << a1.getData().toHex() << Miner::countLeadingZeros(a1.getData());
+    a1.increase();
+    qDebug() << a1.getData().toHex() << Miner::countLeadingZeros(a1.getData());
+    a1.increase();
+    qDebug() <<a1.getData().toHex()<< Miner::countLeadingZeros(a1.getData());
+    a1.increase();
+    qDebug() <<a1.getData().toHex()<< Miner::countLeadingZeros(a1.getData());
     return a.exec();
 }
