@@ -192,7 +192,7 @@ void Bingot::newBlockReceived(Block b)
 
                 QVector<Transaction> keepTransactions;
 
-                foreach(Transaction &t, m_suggestedTransactions)
+                foreach(const Transaction &t, m_suggestedTransactions)
                 {
                     unsigned int total = 0;
                     BlockChain::TransactionState ts = m_blockChain.getTransactionState(t, total);

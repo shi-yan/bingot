@@ -142,12 +142,12 @@ QByteArray Transaction::getMessageJson()
 bool Transaction::parseFromJsonObject(const QJsonObject &messageJson)
 {
     QJsonObject cobj = messageJson["content"].toObject();
-    m_toAddress =  QByteArray::fromBase64(cobj["to"].toString());
-    m_fromAddress = QByteArray::fromBase64(cobj["from"].toString());
+    m_toAddress =  QByteArray::fromBase64(cobj["to"].toString().toLocal8Bit());
+    m_fromAddress = QByteArray::fromBase64(cobj["from"].toString().toLocal8Bit());
     m_amount = cobj["amount"].toInt();
     m_type = (TransactionType) cobj["type"].toInt();
-    m_signature = QByteArray::fromBase64(messageJson["signature"].toString());
-    m_publicKey = QByteArray::fromBase64(messageJson["public_key"].toString());
+    m_signature = QByteArray::fromBase64(messageJson["signature"].toString().toLocal8Bit());
+    m_publicKey = QByteArray::fromBase64(messageJson["public_key"].toString().toLocal8Bit());
 
     return true;
 }

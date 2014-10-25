@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     qDebug() << t.getMessageJson();
 
-    qDebug() << t.verifySignature(b.publicKey());
+    qDebug() << t.verifySignature();
 
 }
 
