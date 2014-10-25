@@ -63,7 +63,8 @@ void NetworkEngine::initialize(Bingot *bingot)
     for(unsigned int i = 0; i < workerThreadCount; ++i)
     {
         SocketWorker *worker = new SocketWorker(m_taskQueue, this);
-        connect(worker,SIGNAL(newTransaction(Transaction)),bingot,SLOT(onNewTransaction(Transaction)));
+        connect(worker, SIGNAL(newTransaction(Transaction)), bingot, SLOT(onNewTransaction(Transaction)));
+        connect(worker, SIGNAL(newBlock(Block)), bingot, SLOT(onNewBlockReceived(Block)));
         worker->moveToThread(worker);
         m_socketWorkerList.push_back(worker);
         worker->start();

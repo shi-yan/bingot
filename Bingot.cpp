@@ -7,7 +7,6 @@
 
 #include <QCryptographicHash>
 
-//request block
 //verify thread can stop
 //ui
 
@@ -163,20 +162,24 @@ void Bingot::startNewMiningRound()
 
     foreach(Miner *miner, m_miners)
     {
-        miner->quit(); //is this enough to stop miner?
+        miner->forceStop();
+        miner->exit();
         miner->deleteLater();
     }
+
+    m_miners.clear();
 
     for(unsigned int i = 0; i < workerThreadCount; ++i)
     {
         Miner *miner = new Miner(m_candidateBlock, chunk*i, chunk*(1+i));
+        connect(miner,SIGNAL(newBlockSolved(Block)),this,SLOT(onNewBlockSolved(Block)));
         miner->moveToThread(miner);
         m_miners.push_back(miner);
         miner->start();
     }
 }
 
-void Bingot::newBlockReceived(Block b)
+void Bingot::onNewBlockReceived(Block b)
 {
     if (b.isValid())
     {
@@ -252,12 +255,13 @@ void Bingot::newBlockReceived(Block b)
     }
 }
 
-void Bingot::newBlockSolved(Block b)
+void Bingot::onNewBlockSolved(Block b)
 {
     if((b.getIndex() == m_blockChain.size()) && m_blockChain.add(b))
     {
         m_networkEngine->sendMessage(b.toMessageJson());
     }
+    startNewMiningRound();
 }
 
 void Bingot::onNewTransaction(Transaction t)

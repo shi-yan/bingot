@@ -13,13 +13,18 @@ class Miner : public QThread
     quint64 m_end;
     int m_target;
     bool m_solved;
+    bool m_stop;
 
 public:
     Miner(const Block &blockToSolve, quint64 begin, quint64 end);
     bool hasSolved();
     void run();
+    void forceStop();
 
     static unsigned int countLeadingZeros(const QByteArray &hash);
+
+signals:
+    void newBlockSolved(Block b);
 
 
 };

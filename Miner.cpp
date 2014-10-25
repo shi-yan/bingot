@@ -35,7 +35,8 @@ Miner::Miner(const Block &blockToSolve, quint64 begin, quint64 end)
       m_begin(begin),
       m_end(end),
       m_target(0),
-      m_solved(false)
+      m_solved(false),
+      m_stop(false)
 {
     m_target = Block::getTarget(m_blockToSolve.getIndex());
 }
@@ -46,7 +47,7 @@ void Miner::run()
 
     BigInt solution(m_begin);
 
-    for(int i = m_begin; i< m_end;++i)
+    for(int i = m_begin; ((i < m_end) && !m_stop); ++i)
     {
         solution.increase();
         QByteArray data;
@@ -64,13 +65,18 @@ void Miner::run()
         {
             m_blockToSolve.setSolution(solution);
             m_solved = true;
+            emit newBlockSolved(m_blockToSolve);
             break;
         }
     }
-    exec();
 }
 
 bool Miner::hasSolved()
 {
     return m_solved;
+}
+
+void Miner::forceStop()
+{
+    m_stop = true;
 }

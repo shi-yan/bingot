@@ -57,8 +57,8 @@ public:
 signals:
 
 public slots:
-    void newBlockReceived(Block b);
-    void newBlockSolved(Block b);
+    void onNewBlockReceived(Block b);
+    void onNewBlockSolved(Block b);
     void onNewTransaction(Transaction t);
 
 private:
