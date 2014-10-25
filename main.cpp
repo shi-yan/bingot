@@ -1,6 +1,8 @@
 #include <QApplication>
 #include "Bingot.h"
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 int main(int argc, char *argv[])
 {
@@ -25,7 +27,17 @@ int main(int argc, char *argv[])
     qDebug() << "from" << t.getFromAddress();
     qDebug() << "to" << t.getToAddress();
 
-    qDebug() << t.getMessageJson();
+    QByteArray transJson = t.getMessageJson();
+
+    Transaction t2;
+
+    t2.parseFromJsonObject(QJsonDocument::fromJson(transJson).object());
+
+    qDebug() << "t1 == t2?" << (t == t2);
+
+    qDebug() << "verify t2 signature" << t2.verifySignature();
+
+    qDebug() << "t2" << t2.getMessageJson();
 
     return a.exec();
 }
