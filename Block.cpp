@@ -30,7 +30,7 @@ QByteArray Block::toJson() const
 {
     QJsonObject jobj;
 
-    jobj["prehash"] = QString::fromUtf8(m_preHash.toBase64());
+    jobj["prehash"] = QString::fromLocal8Bit(m_preHash.toBase64());
     jobj["index"] = m_index;
 
     QJsonArray jarr;
@@ -46,8 +46,6 @@ QByteArray Block::toJson() const
     QByteArray solutionArray;
     solutionArray.append((char*)&m_solution, sizeof(m_solution));
 
-    //jobj["solution"] = QString::fromUtf8(solutionArray.toBase64());
-
     QJsonDocument jdoc(jobj);
 
     return jdoc.toJson();
@@ -57,7 +55,7 @@ QByteArray Block::toMessageJson() const
 {
     QJsonObject jobj;
 
-    jobj["prehash"] = QString::fromUtf8(m_preHash.toBase64());
+    jobj["prehash"] = QString::fromLocal8Bit(m_preHash.toBase64());
     jobj["index"] = m_index;
 
     QJsonArray jarr;
@@ -70,13 +68,11 @@ QByteArray Block::toMessageJson() const
 
     jobj["transactions"] = jarr;
 
-    //jobj["solution"] = QString::fromUtf8(solutionArray.toBase64());
-
     QJsonObject messageJsonObj;
 
     messageJsonObj["message"] = "Block";
     messageJsonObj["block"] = jobj;
-    messageJsonObj["solution"] = QString::fromUtf8(m_solution.getData().toBase64());
+    messageJsonObj["solution"] = QString::fromLocal8Bit(m_solution.getData().toBase64());
 
     QJsonDocument jdoc(messageJsonObj);
 
@@ -174,5 +170,26 @@ const QHash<QByteArray, Transaction> &Block::getTransactions() const
 
 bool Block::parseFromQJsonObject(const QJsonObject &obj)
 {
+    QJsonObject jobj = obj["block"].toObject();
 
+    m_preHash = QByteArray::fromBase64(obj["prehash"].toString().toLocal8Bit());
+    m_index = obj["index"].toInt();
+
+    QJsonArray jarr = obj["transactions"].toArray();
+
+    foreach(QJsonValue t, jarr)
+    {
+        QJsonObject tobj = t.toObject();
+        Transaction transaction;
+        transaction.parseFromJsonObject(tobj);
+        m_transactions.insert(transaction.getSignature(), transaction);
+    }
+
+    QJsonObject messageJsonObj;
+
+    QByteArray solution = QByteArray::fromBase64(obj["solution"].toString().toLocal8Bit());
+
+    m_solution.setData(solution);
+
+    return true;
 }

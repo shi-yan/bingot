@@ -7,7 +7,6 @@
 
 #include <QCryptographicHash>
 
-//count binary 0 instead of hex 0
 //parse receive block
 //request block
 //verify thread can stop

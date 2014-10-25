@@ -66,8 +66,8 @@ void Transaction::operator=(const Transaction &in)
 QByteArray Transaction::getJson()
 {
     QJsonObject obj;
-    obj["to"] = QString::fromUtf8(m_toAddress.toBase64());
-    obj["from"] = QString::fromUtf8(m_toAddress.toBase64());;
+    obj["to"] = QString::fromLocal8Bit(m_toAddress.toBase64());
+    obj["from"] = QString::fromLocal8Bit(m_toAddress.toBase64());;
     obj["amount"] = (qint64) m_amount;
     obj["type"] = m_type;
     obj["time"] = m_timeStamp.toMSecsSinceEpoch();
@@ -126,14 +126,14 @@ QByteArray Transaction::getMessageJson()
     obj["message"] = "Transaction";
 
     QJsonObject cobj;
-    cobj["to"] = QString::fromUtf8(m_toAddress.toBase64());
-    cobj["from"] = QString::fromUtf8(m_toAddress.toBase64());;
+    cobj["to"] = QString::fromLocal8Bit(m_toAddress.toBase64());
+    cobj["from"] = QString::fromLocal8Bit(m_toAddress.toBase64());;
     cobj["amount"] = (qint64) m_amount;
     cobj["type"] = m_type;
 
     obj["content"] = cobj;
-    obj["signature"] = QString::fromUtf8(m_signature.toBase64());
-    obj["public_key"] = QString::fromUtf8(m_publicKey.toBase64());
+    obj["signature"] = QString::fromLocal8Bit(m_signature.toBase64());
+    obj["public_key"] = QString::fromLocal8Bit(m_publicKey.toBase64());
 
     QJsonDocument jdoc(obj);
     return jdoc.toJson();
