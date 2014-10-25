@@ -29,7 +29,7 @@ void BigInt::operator =(quint64 val)
             m_data.push_back((char) 0);
         }
         m_data.data()[index++] = byte;
-        val >> 8;
+        val >>= 8;
     }
 }
 

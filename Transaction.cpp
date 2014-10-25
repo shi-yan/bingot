@@ -67,7 +67,7 @@ QByteArray Transaction::getJson()
 {
     QJsonObject obj;
     obj["to"] = QString::fromLocal8Bit(m_toAddress);
-    obj["from"] = QString::fromLocal8Bit(m_fromAddress);;
+    obj["from"] = QString::fromLocal8Bit(m_fromAddress);
     obj["amount"] = (qint64) m_amount;
     obj["type"] = m_type;
     obj["time"] = QString::number( m_timeStamp.toMSecsSinceEpoch());

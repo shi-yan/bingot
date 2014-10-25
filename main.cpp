@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include "BigInt.h"
+#include "Miner.h"
 
 int main(int argc, char *argv[])
 {
@@ -38,6 +40,10 @@ int main(int argc, char *argv[])
     qDebug() << "verify t2 signature" << t2.verifySignature();
 
     qDebug() << "t2" << t2.getMessageJson();
+
+    BigInt a1(256);
+    qDebug() << "created";
+    qDebug() << Miner::countLeadingZeros(a1.getData());
 
     return a.exec();
 }
