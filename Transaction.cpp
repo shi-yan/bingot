@@ -129,7 +129,7 @@ QByteArray Transaction::getMessageJson()
     QJsonParseError error;
     QJsonDocument cjdoc =QJsonDocument::fromJson(cjson, &error);
 
-    obj["content"] = cjdoc.object();
+    obj["transaction"] = cjdoc.object();
     obj["signature"] = QString::fromLocal8Bit(m_signature.toBase64());
     obj["public_key"] = QString::fromLocal8Bit(m_publicKey.toBase64());
 
@@ -139,7 +139,7 @@ QByteArray Transaction::getMessageJson()
 
 bool Transaction::parseFromJsonObject(const QJsonObject &messageJson)
 {
-    QJsonObject cobj = messageJson["content"].toObject();
+    QJsonObject cobj = messageJson["transaction"].toObject();
     m_toAddress =  cobj["to"].toString().toLocal8Bit();
     m_fromAddress = cobj["from"].toString().toLocal8Bit();
     m_amount = cobj["amount"].toInt();

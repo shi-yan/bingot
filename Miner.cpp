@@ -1,6 +1,8 @@
 #include "Miner.h"
 #include "BigInt.h"
 #include <QCryptographicHash>
+#include <QDebug>
+#include <QElapsedTimer>
 
 unsigned int Miner::countLeadingZeros(const QByteArray &hash)
 {
@@ -43,10 +45,12 @@ Miner::Miner(const Block &blockToSolve, quint64 begin, quint64 end)
 
 void Miner::run()
 {
+    qDebug() << "target" << m_target;
     QByteArray blockJson = m_blockToSolve.toJson();
 
     BigInt solution(m_begin);
-
+    QElapsedTimer timer;
+    timer.start();
     for(int i = m_begin; ((i < m_end) && !m_stop); ++i)
     {
         solution.increase();
@@ -59,10 +63,12 @@ void Miner::run()
 
         QByteArray result = sha512.result();
 
-        int zeroCount = Miner::countLeadingZeros(result);
 
+        int zeroCount = Miner::countLeadingZeros(result);
+        qDebug() << result.toHex() << "zero:" << zeroCount;
         if (zeroCount > m_target)
         {
+            qDebug() << "========================= found ! =================== " << timer.elapsed()*0.001;
             m_blockToSolve.setSolution(solution);
             m_solved = true;
             emit newBlockSolved(m_blockToSolve);

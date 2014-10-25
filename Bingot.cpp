@@ -6,6 +6,8 @@
 #include <QDebug>
 
 #include <QCryptographicHash>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 const unsigned int protocol_version = 1;
 
@@ -145,6 +147,8 @@ void Bingot::Transfer(const QByteArray &toAddress, unsigned int amount)
 
 void Bingot::startNewMiningRound()
 {
+    onQueryBlockChainLength();
+
     Block newCandidateBlock(m_blockChain.size(), m_suggestedTransactions, m_blockChain.getLastBlockHash());
 
     m_candidateBlock = newCandidateBlock;
@@ -237,6 +241,8 @@ void Bingot::onNewBlockReceived(Block b)
                    m_suggestedTransactions.insert(t.getSignature(), t);
                 }
 
+                m_networkEngine->sendMessage(b.toMessageJson());
+
                 startNewMiningRound();
            }
 
@@ -247,9 +253,36 @@ void Bingot::onNewBlockReceived(Block b)
         }
         else if(b.getIndex() > m_blockChain.size())
         {
-            //ask for blocks
+            queryForBlock(m_blockChain.size());
         }
     }
+}
+
+void Bingot::onQueryBlock(int index)
+{
+    if ((index >= 0) && (m_blockChain.size() > index))
+    {
+        QVector<Block> blocks = m_blockChain.at(index);
+        m_networkEngine->sendMessage(blocks[0].toMessageJson());
+    }
+}
+
+void Bingot::onReceivedBlockChainLength(int length)
+{
+    if (length > m_blockChain.size())
+    {
+        queryForBlock(m_blockChain.size());
+    }
+}
+
+void Bingot::onQueryBlockChainLength()
+{
+    QJsonObject jobj;
+    jobj["length"] = m_blockChain.size();
+    jobj["message"] = "BlockChainLength";
+
+    QJsonDocument jdoc(jobj);
+    m_networkEngine->sendMessage(jdoc.toJson());
 }
 
 void Bingot::onNewBlockSolved(Block b)
@@ -328,5 +361,10 @@ void Bingot::onNewTransaction(Transaction t)
 
 void Bingot::queryForBlock(int index)
 {
+    QJsonObject jobj;
+    jobj["message"] = "QueryBlock";
+    jobj["index"] = index;
 
+    QJsonDocument jdoc(jobj);
+    m_networkEngine->sendMessage(jdoc.toJson());
 }

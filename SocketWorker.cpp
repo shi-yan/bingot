@@ -177,6 +177,20 @@ void SocketWorker::handleIncommingMessage(QByteArray json)
                         emit newBlock(b);
                     }
                 }
+                else if(message == "QueryBlock")
+                {
+                    int index = obj["index"].toInt();
+                    emit queryBlock(index);
+                }
+                else if(message == "QueryBlockChainLength")
+                {
+                    emit queryBlockChainLength();
+                }
+                else if(message == "BlockChainLength")
+                {
+                    int length = obj["length"].toInt();
+                    emit getBlockChainLength(length);
+                }
             }
             else
             {

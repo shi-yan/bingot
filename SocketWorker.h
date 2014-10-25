@@ -38,6 +38,9 @@ protected:
 signals:
     void newTransaction(Transaction t);
     void newBlock(Block b);
+    void queryBlock(int index);
+    void queryBlockChainLength();
+    void getBlockChainLength(int);
 
 private slots:
     void onSocketReadyRead();

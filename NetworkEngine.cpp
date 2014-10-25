@@ -65,6 +65,9 @@ void NetworkEngine::initialize(Bingot *bingot)
         SocketWorker *worker = new SocketWorker(m_taskQueue, this);
         connect(worker, SIGNAL(newTransaction(Transaction)), bingot, SLOT(onNewTransaction(Transaction)));
         connect(worker, SIGNAL(newBlock(Block)), bingot, SLOT(onNewBlockReceived(Block)));
+        connect(worker, SIGNAL(queryBlock(int)), bingot, SLOT(onQueryBlock(int)));
+        connect(worker, SIGNAL(queryBlockChainLength()),bingot,SLOT(onQueryBlockChainLength()));
+        connect(worker, SIGNAL(getBlockChainLength(int)),bingot,SLOT(onReceivedBlockChainLength(int)));
         worker->moveToThread(worker);
         m_socketWorkerList.push_back(worker);
         worker->start();

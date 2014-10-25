@@ -60,12 +60,14 @@ public slots:
     void onNewBlockReceived(Block b);
     void onNewBlockSolved(Block b);
     void onNewTransaction(Transaction t);
+    void onQueryBlock(int index);
+    void onQueryBlockChainLength();
+    void onReceivedBlockChainLength(int);
 
 private:
     void generateECDSAKeyPair();
     void generateWalletAddress();
     void queryForBlock(int index);
-
 };
 
 #endif // BINGOT_H

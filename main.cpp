@@ -50,5 +50,23 @@ int main(int argc, char *argv[])
     qDebug() <<a1.getData().toHex()<< Miner::countLeadingZeros(a1.getData());
     a1.increase();
     qDebug() <<a1.getData().toHex()<< Miner::countLeadingZeros(a1.getData());
+
+    QHash<QByteArray, Transaction> h;
+    h.insert(t.getSignature(), t);
+    Block b(1, h, QString("random_prehash").toLocal8Bit());
+
+    qDebug() << b.getCacheBlockHash();
+    qDebug() << b.toJson();
+    qDebug() << b.toMessageJson();
+
+    Block b2;
+    b2.parseFromQJsonObject(QJsonDocument::fromJson( b.toMessageJson()).object());
+
+    qDebug() << "b2:"<< b2.toMessageJson();
+
+    Miner *m_miner = new Miner(b2, 0, 20000000000000);
+    m_miner->moveToThread(m_miner);
+    m_miner->start();
+
     return a.exec();
 }

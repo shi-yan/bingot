@@ -7,7 +7,12 @@
 
 unsigned int Block::getTarget(int index)
 {
-    return index / 5 + 6;
+    return index / 5 + 20;
+
+    //155
+    //500
+    //2.49
+
 }
 
 Block::Block(int index)

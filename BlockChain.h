@@ -34,7 +34,6 @@ public:
 
     unsigned int getAccountAmount(const QByteArray &toAddress);
 
-private:
     const QVector<Block> &at(int index);
 
 signals:
