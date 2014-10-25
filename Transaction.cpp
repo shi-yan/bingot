@@ -196,6 +196,21 @@ Transaction::TransactionType Transaction::getType() const
     return m_type;
 }
 
+const QByteArray Transaction::getToAddress() const
+{
+    return m_toAddress;
+}
+
+const QByteArray Transaction::getFromAddress() const
+{
+    return m_fromAddress;
+}
+
+unsigned int Transaction::getAmount() const
+{
+    return m_amount;
+}
+
 bool operator==(const Transaction &a, const Transaction &b)
 {
     return (a.m_toAddress == b.m_toAddress) &&

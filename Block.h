@@ -35,6 +35,8 @@ public:
     const QByteArray &getPreHash() const;
     const QByteArray &getCacheBlockHash();
 
+    const QHash<QByteArray, Transaction> &getTransactions() const;
+
     void refreshBlockHash();
 
     static unsigned int getTarget(int index);

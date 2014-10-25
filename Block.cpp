@@ -173,3 +173,8 @@ const QByteArray &Block::getCacheBlockHash()
 
     return m_cachedBlockHash;
 }
+
+const QHash<QByteArray, Transaction> &Block::getTransactions() const
+{
+    return m_transactions;
+}

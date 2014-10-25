@@ -13,8 +13,15 @@ private:
     QVector<QVector<Block> > m_chain;
 
 public:
-    explicit BlockChain(QObject *parent = 0);
+    typedef enum
+    {
+        UNCHECKED,
+        NOT_ENOUGH_MONEY,
+        EXISITING,
+        VALID
+    } TransactionState;
 
+    explicit BlockChain(QObject *parent = 0);
 
     int size();
     QByteArray getLastBlockHash();
@@ -22,6 +29,10 @@ public:
     bool add(const Block &b);
 
     void prune();
+
+    TransactionState getTransactionState(const Transaction &t);
+
+    unsigned int getAccountAmount(const QByteArray &toAddress);
 
 private:
     const QVector<Block> &at(int index);

@@ -109,7 +109,9 @@ void Bingot::Transfer(const QByteArray &toAddress, unsigned int amount)
     Transaction t(address(), toAddress, amount);
     t.signTransaction(privateKey(), publicKey());
 
-    m_suggestedTransactions.insertMulti(t.getSignature(), t);
+    //verify you actually has this much money;
+
+    m_suggestedTransactions.insert(t.getSignature(), t);
 }
 
 void Bingot::startNewMiningRound()
@@ -144,8 +146,13 @@ void Bingot::newBlockReceived(Block b)
 
            if( m_blockChain.add(b))
            {
-                //check prehash
                 //recycle m_candidateBlock to m_suggestedTransactions;
+               const QHash<QByteArray, Transaction> &transactions = m_candidateBlock.getTransactions();
+
+                for(QHash<QByteArray, Transaction>::const_iterator t = transactions.begin(); t != transactions.end(); ++t)
+                {
+                    m_suggestedTransactions.insert(t.key(), t.value());
+                }
 
                 //remove m_suggestedTransactions that are in blockChain already
 

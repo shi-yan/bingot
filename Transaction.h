@@ -37,6 +37,10 @@ public:
 
     TransactionType getType() const;
 
+    const QByteArray getToAddress() const;
+    const QByteArray getFromAddress() const;
+    unsigned int getAmount() const;
+
 private:
     QByteArray m_toAddress;
     QByteArray m_fromAddress;

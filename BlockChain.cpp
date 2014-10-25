@@ -1,5 +1,6 @@
 #include "BlockChain.h"
 #include <QCryptographicHash>
+#include <QDebug>
 
 BlockChain::BlockChain(QObject *parent) :
     QObject(parent)
@@ -12,7 +13,9 @@ int BlockChain::size()
 }
 
 QByteArray BlockChain::getLastBlockHash()
-{}
+{
+    return m_chain.last().first().getCacheBlockHash();
+}
 
 const QVector<Block> &BlockChain::at(int index)
 {
@@ -21,8 +24,9 @@ const QVector<Block> &BlockChain::at(int index)
 
 bool BlockChain::add(const Block &b)
 {
-    //need to check redundancy.
-    if (b.getIndex() <= size())
+    //need to check if b is redundant.
+    // need to verify each transaction in b is valid
+    if ((b.getIndex() <= size()) && (b.getIndex() >= size()-2))
     {
         //check preHash
         bool foundMatching = false;
@@ -110,4 +114,127 @@ void BlockChain::prune()
             m_chain[i].push_back(left);
         }
     }
+}
+
+BlockChain::TransactionState BlockChain::getTransactionState(const Transaction &t)
+{
+    if (t.getAmount() == 0 || size() == 0)
+    {
+        return NOT_ENOUGH_MONEY;
+    }
+    else
+    if (size() > 0)
+    {
+        unsigned int total = 0;
+
+        QByteArray preHash;
+        for(int i = size() - 1; i>=0; ++i)
+        {
+            int blockIndex = -1;
+            if (i == size() - 1)
+            {
+                preHash = m_chain[i].at(0).getPreHash();
+                blockIndex = 0;
+            }
+            else
+            {
+                for(int e = 0; e< m_chain[i].size(); ++e)
+                {
+                    if (m_chain[i][e].getCacheBlockHash() == preHash)
+                    {
+                        preHash = m_chain[i][e].getPreHash();
+                        blockIndex = e;
+                        break;
+                    }
+                }
+            }
+
+            Q_ASSERT(blockIndex != -1);
+
+            Block b = m_chain[i].at(blockIndex);
+
+            {
+                QHash<QByteArray, Transaction> transactionsInBlock = b.getTransactions();
+
+                for(QHash<QByteArray, Transaction>::iterator iter = transactionsInBlock.begin(); iter != transactionsInBlock.end(); ++iter)
+                {
+                    if (iter.key() == t.getSignature())
+                    {
+                        if (iter.value() == t)
+                        {
+                            return EXISITING;
+                        }
+                    }
+                    else if(iter.value().getToAddress() == t.getFromAddress())
+                    {
+                        total += iter.value().getAmount();
+                    }
+                }
+            }
+
+            qDebug() << "Total value for account" << t.getFromAddress() << total;
+
+            if (total > t.getAmount())
+            {
+                return VALID;
+            }
+            else
+            {
+                return NOT_ENOUGH_MONEY;
+            }
+        }
+    }
+
+    return UNCHECKED;
+}
+
+unsigned int BlockChain::getAccountAmount(const QByteArray &toAddress)
+{
+    unsigned int total = 0;
+
+    if (size() > 0)
+    {
+        QByteArray preHash;
+        for(int i = size() - 1; i>=0; ++i)
+        {
+            int blockIndex = -1;
+            if (i == size() - 1)
+            {
+                preHash = m_chain[i].at(0).getPreHash();
+                blockIndex = 0;
+            }
+            else
+            {
+                for(int e = 0; e< m_chain[i].size(); ++e)
+                {
+                    if (m_chain[i][e].getCacheBlockHash() == preHash)
+                    {
+                        preHash = m_chain[i][e].getPreHash();
+                        blockIndex = e;
+                        break;
+                    }
+                }
+            }
+
+            Q_ASSERT(blockIndex != -1);
+
+            Block b = m_chain[i].at(blockIndex);
+
+            {
+                QHash<QByteArray, Transaction> transactionsInBlock = b.getTransactions();
+
+                for(QHash<QByteArray, Transaction>::iterator iter = transactionsInBlock.begin(); iter != transactionsInBlock.end(); ++iter)
+                {
+                    if(iter.value().getToAddress() == toAddress)
+                    {
+                        total += iter.value().getAmount();
+                    }
+                }
+            }
+
+            qDebug() << "Total value for account" << toAddress << total;
+        }
+    }
+
+    return total;
 }

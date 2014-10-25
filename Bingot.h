@@ -49,6 +49,8 @@ public:
 
     void startNewMiningRound();
 
+    void addSuggestedTransactions(Transaction &t);
+
 signals:
 
 public slots:
