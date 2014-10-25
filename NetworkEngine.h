@@ -48,7 +48,6 @@ public:
     void initialize(Bingot *bingot);
     ~NetworkEngine();
 
-    QByteArray getPeerAddressJson();
     void addPeer(const Peer& in);
 
     void sendMessage(const QByteArray &msg);

@@ -94,8 +94,9 @@ NetworkEngine::~NetworkEngine()
     }
 }
 
-QByteArray NetworkEngine::getPeerAddressJson()
+void NetworkEngine::onPeerTimerTimeout()
 {
+
     QJsonArray jarray;
     m_peerAddressesMutex.lock();
 
@@ -111,22 +112,10 @@ QByteArray NetworkEngine::getPeerAddressJson()
 
     QJsonObject jobj;
 
-    jobj["message"] = "PeerSyncReply";
+    jobj["message"] = "PeerSync";
     jobj["peers"] = jarray;
 
     QJsonDocument jdoc(jobj);
-    return jdoc.toJson();
-}
-
-void NetworkEngine::onPeerTimerTimeout()
-{
-    qDebug() << "query for new peers";
-
-    QByteArray message;
-
-    QJsonObject obj;
-    obj["message"] = "PeerSync";
-    QJsonDocument jdoc(obj);
 
     sendMessage(jdoc.toJson());
 }

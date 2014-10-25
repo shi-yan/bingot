@@ -172,10 +172,10 @@ bool Block::parseFromQJsonObject(const QJsonObject &obj)
 {
     QJsonObject jobj = obj["block"].toObject();
 
-    m_preHash = QByteArray::fromBase64(obj["prehash"].toString().toLocal8Bit());
-    m_index = obj["index"].toInt();
+    m_preHash = QByteArray::fromBase64(jobj["prehash"].toString().toLocal8Bit());
+    m_index = jobj["index"].toInt();
 
-    QJsonArray jarr = obj["transactions"].toArray();
+    QJsonArray jarr = jobj["transactions"].toArray();
 
     foreach(QJsonValue t, jarr)
     {
@@ -184,8 +184,6 @@ bool Block::parseFromQJsonObject(const QJsonObject &obj)
         transaction.parseFromJsonObject(tobj);
         m_transactions.insert(transaction.getSignature(), transaction);
     }
-
-    QJsonObject messageJsonObj;
 
     QByteArray solution = QByteArray::fromBase64(obj["solution"].toString().toLocal8Bit());
 

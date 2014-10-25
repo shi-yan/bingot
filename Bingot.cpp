@@ -7,7 +7,6 @@
 
 #include <QCryptographicHash>
 
-//parse receive block
 //request block
 //verify thread can stop
 //ui

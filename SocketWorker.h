@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include "NetworkTaskQueue.h"
 #include "Transaction.h"
+#include "Block.h"
 
 class NetworkEngine;
 class SocketWorker : public QThread
@@ -36,6 +37,7 @@ protected:
 
 signals:
     void newTransaction(Transaction t);
+    void newBlock(Block b);
 
 private slots:
     void onSocketReadyRead();

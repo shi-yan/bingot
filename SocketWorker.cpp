@@ -145,19 +145,7 @@ void SocketWorker::handleIncommingMessage(QByteArray json)
             {
                 QString message = obj["message"].toString();
 
-                if (message == "PeerSync")
-                {
-                    QByteArray peers = m_networkEngine->getPeerAddressJson();
-                    quint32 size = peers.size();
-                    QByteArray replyMessage;
-                    replyMessage.append(size);
-                    replyMessage.append(peers);
-                    m_socket->write(replyMessage);
-                    m_socket->waitForBytesWritten();
-
-                    m_hasTaskFinished = true;
-                }
-                else if(message == "PeerSyncReply")
+                if(message == "PeerSync")
                 {
                     QJsonArray peers = obj["peers"].toArray();
 
@@ -179,6 +167,14 @@ void SocketWorker::handleIncommingMessage(QByteArray json)
                     if (t.parseFromJsonObject(obj))
                     {
                         emit newTransaction(t);
+                    }
+                }
+                else if(message == "Block")
+                {
+                    Block b;
+                    if (b.parseFromQJsonObject(obj))
+                    {
+                        emit newBlock(b);
                     }
                 }
             }
