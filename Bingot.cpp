@@ -7,7 +7,6 @@
 
 #include <QCryptographicHash>
 
-//large integer
 //count binary 0 instead of hex 0
 //parse receive block
 //request block
@@ -257,7 +256,7 @@ void Bingot::newBlockReceived(Block b)
 
 void Bingot::newBlockSolved(Block b)
 {
-    if(b.getIndex()==size() && m_blockChain.add(b))
+    if((b.getIndex() == m_blockChain.size()) && m_blockChain.add(b))
     {
         m_networkEngine->sendMessage(b.toMessageJson());
     }

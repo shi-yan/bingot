@@ -3,6 +3,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QCryptographicHash>
+#include "Miner.h"
 
 unsigned int Block::getTarget(int index)
 {
@@ -23,7 +24,6 @@ Block::Block(int index, const QHash<QByteArray, Transaction> &transactions, cons
       m_preHash(preHash),
       m_solution(0)
 {
-
 }
 
 QByteArray Block::toJson() const
@@ -70,16 +70,13 @@ QByteArray Block::toMessageJson() const
 
     jobj["transactions"] = jarr;
 
-    QByteArray solutionArray;
-    solutionArray.append((char*)&m_solution, sizeof(m_solution));
-
     //jobj["solution"] = QString::fromUtf8(solutionArray.toBase64());
 
     QJsonObject messageJsonObj;
 
     messageJsonObj["message"] = "Block";
     messageJsonObj["block"] = jobj;
-    messageJsonObj["solution"] = QString::fromUtf8(solutionArray.toBase64());
+    messageJsonObj["solution"] = QString::fromUtf8(m_solution.getData().toBase64());
 
     QJsonDocument jdoc(messageJsonObj);
 
@@ -101,7 +98,7 @@ int Block::getIndex() const
     return m_index;
 }
 
-void Block::setSolution(quint64 solution)
+void Block::setSolution(BigInt solution)
 {
     m_solution = solution;
 }
@@ -112,19 +109,15 @@ bool Block::isValid()
     QByteArray blockJson = toJson();
 
     QByteArray data;
-    data.push_back(m_solution);
+    data.push_back(m_solution.getData());
     data.push_back(blockJson);
     QCryptographicHash sha512(QCryptographicHash::Sha3_512);
 
     sha512.addData(data);
 
-    QByteArray result = sha512.result().toHex();
+    QByteArray result = sha512.result();
 
-    int zeroCount = 0;
-    while(result.at(zeroCount) == '0')
-    {
-        zeroCount++;
-    }
+    int zeroCount = Miner::countLeadingZeros(result);
 
     unsigned int target = Block::getTarget(m_index);
 

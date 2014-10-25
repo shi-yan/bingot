@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <QHash>
 #include "Transaction.h"
+#include "BigInt.h"
 
 class Block
 {
@@ -12,8 +13,7 @@ class Block
 
     QHash<QByteArray, Transaction> m_transactions;
 
-    //I'm not sure if 64bit integer is enough
-    quint64 m_solution;
+    BigInt m_solution;
 
     int m_index;
 
@@ -29,7 +29,7 @@ public:
     void addTransaction(const Transaction &t);
     void removeTransaction(const Transaction &t);
     int getIndex() const;
-    void setSolution(quint64 solution);
+    void setSolution(BigInt solution);
     bool isValid();
 
     const QByteArray &getPreHash() const;

@@ -19,6 +19,8 @@ public:
     bool hasSolved();
     void run();
 
+    static unsigned int countLeadingZeros(const QByteArray &hash);
+
 
 };
 

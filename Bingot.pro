@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     NetworkEngine.cpp \
     SocketWorker.cpp \
     NetworkTask.cpp \
-    NetworkTaskQueue.cpp
+    NetworkTaskQueue.cpp \
+    BigInt.cpp
 
 HEADERS  += MainWindow.h \
     Bingot.h \
@@ -34,7 +35,8 @@ HEADERS  += MainWindow.h \
     NetworkEngine.h \
     SocketWorker.h \
     NetworkTask.h \
-    NetworkTaskQueue.h
+    NetworkTaskQueue.h \
+    BigInt.h
 
 FORMS    += mainwindow.ui
 
