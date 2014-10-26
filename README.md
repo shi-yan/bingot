@@ -18,7 +18,7 @@ I’d like to explain bitcoin in the following way:
 
 1. A currency needs (is) a network. For example, if I purchase something from someone, the moment I hand over my money, I'm having a relationship with that person. After all the physical distance between us needs to be small enough to pass the money.
 
-2. Bitcoin therefore is also a network. It is more similar to Facebook, where each one is connected with few others, through them he/she can reach the whole world.
+2. Bitcoin therefore is also a network. It is more similar to Facebook, where each one is connected with few others. Through them he/she can reach the whole world.
 
 3. In the Bitcoin world, everybody keeps a ledger that has records of all transactions ever since the first second when Bitcoin started.
 
