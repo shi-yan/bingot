@@ -1,6 +1,5 @@
-bingot
+![bingot](bingot.png)
 ======
-<img style="display:block;margin-left:auto;margin-right:auto;" src="bingot.png" />
 
 bingot is a simple cryptocurrency implementation. The goal of this project is for me to understand cryptocurrency down to the code level. I have always been fascinated about bitcoin. However after reading so many articles, I still lack understanding of some implementation details. Although The real bitcoin code base has grown too large to study, two months ago, I found [BasicCoin](https://github.com/zack-bitcoin/basiccoin), a simple cryptocurrency implementation in Python, which inspired me to write bingot. 
 
