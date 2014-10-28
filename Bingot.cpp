@@ -23,7 +23,7 @@ void Bingot::initialize()
     m_networkEngine = new NetworkEngine();
     m_networkEngine->listen(QHostAddress::Any, 42231);
     generateECDSAKeyPair();
-    generateWalletAddress();
+    m_address = generateWalletAddress();
 }
 
 void Bingot::generateECDSAKeyPair()
@@ -74,11 +74,18 @@ void Bingot::generateECDSAKeyPair()
     qDebug() << "public key:" << m_publicKey.size() << m_publicKey.toHex();
 }
 
-void Bingot::generateWalletAddress()
+QByteArray Bingot::generateWalletAddress(QByteArray publicKey)
 {
     QCryptographicHash hasher1(QCryptographicHash::Sha3_512);
 
-    hasher1.addData(m_publicKey);
+    if (publicKey.isEmpty())
+    {
+        hasher1.addData(m_publicKey);
+    }
+    else
+    {
+        hasher1.addData(publicKey);
+    }
 
     QByteArray a1 = hasher1.result();
     a1.prepend((const char*)&protocol_version, sizeof(protocol_version));
@@ -105,8 +112,7 @@ void Bingot::generateWalletAddress()
 
     qDebug() << "with checksum" << a1.toHex();
 
-    m_address = a1.toBase64();
-    qDebug() << "final address" << m_address;
+    return a1.toBase64();
 }
 
 void Bingot::Transfer(const QByteArray &toAddress, unsigned int amount)
@@ -304,6 +310,11 @@ void Bingot::onNewTransaction(Transaction t)
     if (t.getToAddress() == t.getFromAddress())
     {
         return; //can't self transfer;
+    }
+
+    if ( generateWalletAddress(t.getPublicKey()) != t.getFromAddress())
+    {
+        return; //because from address and public key don't match
     }
 
     if (!t.verifySignature())

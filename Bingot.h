@@ -66,7 +66,7 @@ public slots:
 
 private:
     void generateECDSAKeyPair();
-    void generateWalletAddress();
+    QByteArray generateWalletAddress(const QByteArray publicKey = QByteArray());
     void queryForBlock(int index);
 };
 
